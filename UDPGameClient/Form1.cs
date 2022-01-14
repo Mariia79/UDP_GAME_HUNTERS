@@ -5,52 +5,35 @@ using System.Text;
 using System.Windows.Forms;
 using System.Threading.Tasks;
 using GameModelsLib;
-
+using System.IO;
+using GameModelsLib;
 
 namespace UDPGameClient
 {
     public partial class Form1 : Form
     {
-        bool alive = false; // будет ли работать поток для приема
-        UdpClient client;
-        const int LOCALPORT = 8002; // порт для приема сообщений
-        const int REMOTEPORT = 8001; // порт для отправки сообщений
-        const int TTL = 20;
-        const string HOST = "235.5.5.1"; // хост для групповой рассылки
-        IPAddress groupAddress; // адрес для групповой рассылки
-
-        string userName; // имя пользователя в чате
         public Form1()
         {
             InitializeComponent();
 
-            loginButton.Enabled = true; // кнопка входа
-            logoutButton.Enabled = false; // кнопка выхода
-            sendButton.Enabled = false; // кнопка отправки
-            chatTextBox.ReadOnly = true; // поле для сообщений
+            loginButton.Enabled = true;
+            logoutButton.Enabled = false;
+            sendButton.Enabled = false; 
+            chatTextBox.ReadOnly = true; 
 
-            groupAddress = IPAddress.Parse(HOST);
         }
-        // обработчик нажатия кнопки loginButton
+  
         private void loginButton_Click(object sender, EventArgs e)
         {
-            userName = userNameTextBox.Text;
-            userNameTextBox.ReadOnly = true;
+            UDPClient.userName = userNameTextBox.SelectedItem.ToString();
+            userNameTextBox.Enabled = false;
 
             try
             {
-                client = new UdpClient(LOCALPORT);
-                // присоединяемся к групповой рассылке
-                client.JoinMulticastGroup(groupAddress, TTL);
-
-                // запускаем задачу на прием сообщений
-                Task receiveTask = new Task(ReceiveMessages);
+                UDPClient.ReadPortsSettings();// вичутеэмо значення портів
+                Task receiveTask = new Task(ReceiveMessages);// включаємо приймач повідомленб
                 receiveTask.Start();
 
-                // отправляем первое сообщение о входе нового пользователя
-                string message = userName + " вошел в чат";
-                byte[] data = Encoding.Unicode.GetBytes(message);
-                client.Send(data, data.Length, HOST, REMOTEPORT);
 
                 loginButton.Enabled = false;
                 logoutButton.Enabled = true;
@@ -61,36 +44,38 @@ namespace UDPGameClient
                 MessageBox.Show(ex.Message);
             }
 
-            if (!String.IsNullOrEmpty(userName))
+            if (!String.IsNullOrEmpty(UDPClient.userName))
             {
-                Game.InitGame(userName, panelGameField, lblInfo, btnPlay);
-                Game.CreateClientHunter();
+                Game.InitGame(UDPClient.userName, panelGameField, lblInfo, btnPlay);
                 Game.IsRun = true;
             }
         }
-        // метод приема сообщений
+
+
         private void ReceiveMessages()
         {
-            alive = true;
+            UDPClient.alive = true;
             try
             {
-                while (alive)
+                while (UDPClient.alive)
                 {
                     IPEndPoint remoteIp = null;
-                    byte[] data = client.Receive(ref remoteIp);
+                    byte[] data = UDPClient.client.Receive(ref remoteIp);
                     string message = Encoding.Unicode.GetString(data);
 
-                    // добавляем полученное сообщение в текстовое поле
                     this.Invoke(new MethodInvoker(() =>
                     {
-                        string time = DateTime.Now.ToShortTimeString();
-                        chatTextBox.Text = time + " " + message + "\r\n" + chatTextBox.Text;
+                        //string time = DateTime.Now.ToShortTimeString();
+                        //chatTextBox.Text = message + "\r\n" + chatTextBox.Text;
+                        Game.CheckHuntersAction(message);
+                        Game.CheckNewRegisteredHunters(message);
+
                     }));
                 }
             }
             catch (ObjectDisposedException)
             {
-                if (!alive)
+                if (!UDPClient.alive)
                     return;
                 throw;
             }
@@ -99,14 +84,13 @@ namespace UDPGameClient
                 MessageBox.Show(ex.Message);
             }
         }
-        // обработчик нажатия кнопки sendButton
+
         private void sendButton_Click(object sender, EventArgs e)
         {
             try
             {
-                string message = String.Format("{0}: {1}", userName, messageTextBox.Text);
-                byte[] data = Encoding.Unicode.GetBytes(message);
-                client.Send(data, data.Length, HOST, REMOTEPORT);
+                string message = String.Format("{0}: {1}", UDPClient.userName, messageTextBox.Text);
+                UDPClient.SendMessageInfo(message);
                 messageTextBox.Clear();
             }
             catch (Exception ex)
@@ -122,13 +106,13 @@ namespace UDPGameClient
         // выход из чата
         private void ExitChat()
         {
-            string message = userName + " покидает чат";
-            byte[] data = Encoding.Unicode.GetBytes(message);
-            client.Send(data, data.Length, HOST, REMOTEPORT);
-            client.DropMulticastGroup(groupAddress);
+            string message = UDPClient.userName + " покидает чат";
+            UDPClient.SendMessageInfo(message);
 
-            alive = false;
-            client.Close();
+            UDPClient.client.DropMulticastGroup(UDPClient.groupAddress);
+
+            UDPClient.alive = false;
+            UDPClient.client.Close();
 
             loginButton.Enabled = true;
             logoutButton.Enabled = false;
@@ -137,7 +121,7 @@ namespace UDPGameClient
         // обработчик события закрытия формы
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (alive)
+            if (UDPClient.alive)
                 ExitChat();
         }
 
@@ -149,7 +133,7 @@ namespace UDPGameClient
 
         private void button1_Click(object sender, EventArgs e)
         {
-            
+
         }
     }
 }

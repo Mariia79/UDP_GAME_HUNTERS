@@ -11,10 +11,10 @@ namespace GameModelsLib
             timer = new System.Windows.Forms.Timer();
             timer.Interval = 150;
             timer.Tick += Timer_Tick;
-            timer.Start();
+
         }
 
-        
+
 
         public virtual void Die()
         {
@@ -32,7 +32,7 @@ namespace GameModelsLib
             if (Game.IsRun)
                 Run();
             //else
-              //  timer.Stop();
+            //  timer.Stop();
         }
 
         public override void Run()

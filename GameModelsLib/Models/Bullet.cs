@@ -23,6 +23,8 @@ namespace GameModelsLib
                 ImageFolder = "bullet";
                 Step = 20;
             });
+
+            timer.Start();
         }
 
         private void Timer_Tick(object sender, EventArgs e)

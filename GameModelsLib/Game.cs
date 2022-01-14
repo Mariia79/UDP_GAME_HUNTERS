@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using SimpleTCP;
+
 
 namespace GameModelsLib
 {
@@ -30,6 +30,7 @@ namespace GameModelsLib
         public static int Height = 600;
 
         public static string PlayerName = "";
+
 
 
         public static System.Windows.Forms.Timer timer;
@@ -59,12 +60,41 @@ namespace GameModelsLib
         }
 
 
+        public static void Timer_Tick1(object sender, EventArgs e)
+        {
+            if (IsRun)
+            {
+                Random rnd = new Random();
+
+                int vypadok = rnd.Next(1, 6);
+                Point p = Game.GetRandomPosition(800, 600);
+
+                if (vypadok <= 1)
+                {
+                    //server.BroadcastLine("*" + 1.ToString() + " " + p.X.ToString() + " " + p.Y.ToString() + " ");
+                    return;
+                }
+                if (vypadok <= 3)
+                {
+                    //server.BroadcastLine("*" + 2.ToString() + " " + p.X.ToString() + " " + p.Y.ToString() + " ");
+                    return;
+                }
+                if (vypadok <= 6)
+                {
+                    //server.BroadcastLine("*" + 3.ToString() + " " + p.X.ToString() + " " + p.Y.ToString() + " ");
+                    return;
+                }
+            }
+        }
+
         private static int huntersCount = 0;
         public static int HuntersCount
         {
             get;
             set;
         }
+
+        static public int PlayersCount = 4;
 
         static public List<Hunter> Hunters;
 
@@ -130,43 +160,11 @@ namespace GameModelsLib
 
                 name = words[1];
 
-                bool find = false;
-                foreach (Hunter h in Hunters)
+
+                Game.GameField.Invoke((MethodInvoker)delegate ()
                 {
-                    if (h.Number == num)
-                        find = true;
-                }
-                if (!find)
-                {
-                    Game.GameField.Invoke((MethodInvoker)delegate ()
-                    {
-                        LoginNewPlayer(num, name);
-                    });
-                }
-
-                if (MyHunter == null)
-                {
-                    foreach (Hunter h in Hunters)
-                    {
-                        if (h.Name.Contains(PlayerName))
-                        {
-                            MyHunter = h;
-                            break;
-                        }
-                    }
-
-                    MyHunter.ShowInfo();
-                    Game.lblInfo.Invoke((MethodInvoker)delegate ()
-                    {
-                        lblInfo.Text = MyHunter.Name;
-                    });
-
-                    Game.btnPlay.Invoke((MethodInvoker)delegate ()
-                    {
-
-                        btnPlay.Visible = num == 0;
-                    });
-                }
+                    AddNewConnectedPlayer(num, name);
+                });
 
 
             }
@@ -175,51 +173,49 @@ namespace GameModelsLib
 
         public static void CreateClientHunter()
         {
-            int num = 0;
-                LoginNewPlayer(num, PlayerName);
+            int num = Convert.ToInt32(PlayerName);
+            LoginNewPlayer(num, PlayerName);
 
 
-                if (MyHunter == null)
+            if (MyHunter == null)
+            {
+                foreach (Hunter h in Hunters)
                 {
-                    foreach (Hunter h in Hunters)
+                    if (h.Name.Contains(PlayerName))
                     {
-                        if (h.Name.Contains(PlayerName))
-                        {
-                            MyHunter = h;
-                            break;
-                        }
+                        MyHunter = h;
+                        break;
                     }
-
-                    MyHunter.ShowInfo();
-                    Game.lblInfo.Invoke((MethodInvoker)delegate ()
-                    {
-                        lblInfo.Text = MyHunter.Name;
-                    });
-
-                    Game.btnPlay.Invoke((MethodInvoker)delegate ()
-                    {
-
-                        btnPlay.Visible = num == 0;
-                    });
                 }
 
+                MyHunter.ShowInfo();
+                Game.lblInfo.Invoke((MethodInvoker)delegate ()
+                {
+                    lblInfo.Text = MyHunter.Name;
+                });
 
-     
+                Game.btnPlay.Invoke((MethodInvoker)delegate ()
+                {
+
+                    btnPlay.Visible = num == 0;
+                });
+            }
+
+
+
         }
 
         public static void CheckHuntersAction(string msg)
         {
-            if (msg.Length == 3)
+            if (msg[0] == '+')
             {
-                int num = Convert.ToInt32(msg[0].ToString());
-                char act = msg[1];
+                int num = Convert.ToInt32(msg[1].ToString());
+                char act = msg[2];
 
                 if (MyHunter.Number != num)
                 {
                     Hunters[num].MoveHunter(act);
                 }
-
-
             }
         }
 
@@ -230,7 +226,7 @@ namespace GameModelsLib
 
             if (!IsRun)
             {
-                CheckNewRegisteredHunters(msg); 
+                CheckNewRegisteredHunters(msg);
                 if (msg.Contains("start"))
                 {
                     IsRun = true;
@@ -242,12 +238,11 @@ namespace GameModelsLib
                     }
                 }
             }
-            else 
+            else
             {
-               
 
                 CheckHuntersAction(msg);
-                    
+
                 GetDropBox(msg);
                 if (msg.Contains("end"))
                 {
@@ -270,7 +265,7 @@ namespace GameModelsLib
 
         public static void SendHunterActionState(Hunter h)
         {
-            client.WriteLineAndGetReply(h.ActionsState, TimeSpan.FromSeconds(0));
+            UDPClient.SendMessageInfo("+" + h.ActionsState);
         }
 
         public static void SendHunterHealthAmmoState(Hunter h)
@@ -278,24 +273,14 @@ namespace GameModelsLib
             client.WriteLineAndGetReply(h.HealthAmmoState, TimeSpan.FromSeconds(0));
         }
 
-        public static void InitGame(string plName, PictureBox p, Label l, Button btn)
+        public static void InitGame(string plName, PictureBox p, Label l, Button btn)// коли гравецб запустив гру і залогінивс
         {
             btnPlay = btn;
             Restart();
 
             PlayerName = plName;
-
-            //if (client == null)
-            //{
-            //    client = new SimpleTcpClient();
-            //    client.StringEncoder = Encoding.UTF8;
-            //    client.DataReceived += Client_DataReceived;
-            //}
-
-            //client.Connect("127.0.0.1", 8910);
             huntersCount = 0;
-
-
+            HuntersCount = 0;
             lblInfo = l;
 
             GameField = p;
@@ -303,6 +288,41 @@ namespace GameModelsLib
 
             if (Hunters == null)
                 Hunters = new List<Hunter>();
+
+            for (int i = 0; i < PlayersCount; i++)
+            {
+                Hunter h = new Hunter(i.ToString(), Color.Blue, GetHunterPosition(i));
+                h.Number = i;
+                h.IsConect = false;
+                Hunters.Add(h);
+                HuntersCount++;
+
+            }
+
+            if (MyHunter == null)
+            {
+                MyHunter = Hunters[Convert.ToInt32(PlayerName)];
+                MyHunter.IsConect = true;
+                MyHunter.PreloadSkinImages();
+                MyHunter.ApplySkin();
+            }
+
+            UDPClient.SendMessageInfo("_" + Game.MyHunter.Number.ToString() + " " + Game.MyHunter.Name);
+            // _ - підключення нового гравця
+        }
+
+
+
+        public static void AddNewConnectedPlayer(int num, string name)
+        {
+            if (!Hunters[num].IsConect)
+            {
+                Hunters[num].IsConect = true;
+                Hunters[num].PreloadSkinImages();
+                Hunters[num].ApplySkin();
+                UDPClient.SendMessageInfo("_" + Game.MyHunter.Number.ToString() + " " + Game.MyHunter.Name);
+            }
+
         }
 
         public static Hunter LoginNewPlayer(int num, string name)
@@ -336,13 +356,10 @@ namespace GameModelsLib
                 OtherNewHunter.Number = num;
                 HuntersCount++;
 
-
             }
             else
             {
-
                 MessageBox.Show("Limit 4 players!");
-
             }
 
             return OtherNewHunter;
@@ -358,7 +375,7 @@ namespace GameModelsLib
                 string myMessage = "";
 
 
-               
+
 
                 if (!IsEndGame)
                 {
@@ -435,20 +452,20 @@ namespace GameModelsLib
             switch (num)
             {
                 case 0:
-                    p.X = 100;
-                    p.Y = 100;
+                    p.X = 50;
+                    p.Y = 50;
                     return p;
                 case 1:
-                    p.X = GameField.Width - 100;
-                    p.Y = GameField.Height - 100;
+                    p.X = GameField.Width - 50;
+                    p.Y = GameField.Height - 50;
                     return p;
                 case 2:
-                    p.X = 100;
-                    p.Y = GameField.Height - 100;
+                    p.X = 50;
+                    p.Y = GameField.Height - 50;
                     return p;
                 case 3:
-                    p.X = GameField.Width - 100;
-                    p.Y = 100;
+                    p.X = GameField.Width - 50;
+                    p.Y = 50;
                     return p;
             }
 

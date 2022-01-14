@@ -18,8 +18,8 @@ namespace GameModelsLib
         public Label LabelName;
         public bool IsCanMove = false;
         private Point point;
+        public bool IsConect = false;
 
-        
         public string ActionsState
         {
             get;
@@ -55,7 +55,7 @@ namespace GameModelsLib
             LabelName.ForeColor = color;
             Game.GameField.Controls.Add(LabelName);
 
-           
+
 
             player = new System.Media.SoundPlayer(Environment.CurrentDirectory + "\\sounds\\shoot.wav");
             ShowInfo();
@@ -64,10 +64,12 @@ namespace GameModelsLib
 
         public void ShowInfo()
         {
+
             LabelName.Invoke((MethodInvoker)delegate ()
             {
                 LabelName.Text = Name + " " + LifeScore.ToString() + " " + Ammo.ToString();
             });
+
         }
 
         public override void Run()
@@ -110,7 +112,6 @@ namespace GameModelsLib
             }
         }
 
-
         public virtual void ChangeDirection()
         {
             switch (Direction)
@@ -143,25 +144,27 @@ namespace GameModelsLib
             {
                 Direction = MoveDirection.Up;
                 IsCanMove = true;
+                Run();
 
             }
             if (KeyChar == 'a')
             {
                 Direction = MoveDirection.Left;
                 IsCanMove = true;
-
+                Run();
             }
             if (KeyChar == 'd')
             {
                 Direction = MoveDirection.Right;
                 IsCanMove = true;
+                Run();
 
             }
             if (KeyChar == 's')
             {
                 Direction = MoveDirection.Down;
                 IsCanMove = true;
-
+                Run();
             }
             if (KeyChar == 'b')
             {
@@ -172,7 +175,7 @@ namespace GameModelsLib
             {
                 IsCanMove = false;
             }
-            
+
 
         }
 
@@ -182,7 +185,7 @@ namespace GameModelsLib
             if (Game.IsRun)
             {
                 ActionsState = Number.ToString() + e.KeyChar.ToString();
-                //Game.SendHunterActionState(this);
+                Game.SendHunterActionState(this);
                 MoveHunter(e.KeyChar);
             }
         }
