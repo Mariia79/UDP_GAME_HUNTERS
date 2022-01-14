@@ -219,10 +219,8 @@ namespace GameModelsLib
             }
         }
 
-        public static void Client_DataReceived(object sender, SimpleTCP.Message e)
+        public static void CheckGameState(string msg)
         {
-            string msg = e.MessageString.ToString();
-
 
             if (!IsRun)
             {
@@ -230,20 +228,14 @@ namespace GameModelsLib
                 if (msg.Contains("start"))
                 {
                     IsRun = true;
-
-                    if (MyHunter != null)
-                    {
-
-                        OnChangeGame();
-                    }
                 }
             }
             else
             {
-
                 CheckHuntersAction(msg);
 
                 GetDropBox(msg);
+
                 if (msg.Contains("end"))
                 {
                     IsRun = false;
@@ -312,7 +304,6 @@ namespace GameModelsLib
         }
 
 
-
         public static void AddNewConnectedPlayer(int num, string name)
         {
             if (!Hunters[num].IsConect)
@@ -366,21 +357,16 @@ namespace GameModelsLib
         }
 
 
-        static bool CheckEndGame()
+        public static void CheckEndGame()
         {
-            bool IsEndGame = false;
-
             lblInfo.Invoke((MethodInvoker)delegate ()
             {
                 string myMessage = "";
-
-
-
-
-                if (!IsEndGame)
+                string WinnerName = "";
+                if (Game.IsRun)
                 {
                     int alive = 0;
-                    string WinnerName = "";
+                   
                     foreach (Hunter h in Hunters)
                     {
                         if (h.LifeScore > 0)
@@ -392,27 +378,15 @@ namespace GameModelsLib
                     if (alive == 1)
                     {
                         lblInfo.Text = myMessage + ". Game is over! " + WinnerName + " WIN !!!";
-                        IsEndGame = true;
-                        Game.client.WriteLineAndGetReply("end", TimeSpan.FromSeconds(1));
+
+                        Game.IsRun = false;
+                        UDPClient.SendMessageInfo("end");
+                       
                     }
-                }
-
-                if (MyHunter == null)
-                {
-
-                    if (timer != null)
-                    {
-                        timer.Stop();
-                        timer = null;
-                    }
-
-                    GameEndType = GameEndTypes.HunterIsDead;
-                    //lblInfo.Text = myMessage + ". Game is over! " + PlayerName + " is dead!";
-                    IsEndGame = true;
                 }
 
             });
-            return IsEndGame;
+
         }
 
         public static Point GetRandomPosition()
@@ -487,16 +461,7 @@ namespace GameModelsLib
 
         }
 
-        public static void OnChangeGame()
-        {
-            IsRun = !CheckEndGame();
 
-            //if (!IsRun)
-            //{
-            //    Restart();
-            //}
-
-        }
 
 
     }

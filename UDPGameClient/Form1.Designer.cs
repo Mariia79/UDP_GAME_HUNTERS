@@ -30,9 +30,6 @@
         {
             this.loginButton = new System.Windows.Forms.Button();
             this.logoutButton = new System.Windows.Forms.Button();
-            this.chatTextBox = new System.Windows.Forms.TextBox();
-            this.messageTextBox = new System.Windows.Forms.TextBox();
-            this.sendButton = new System.Windows.Forms.Button();
             this.panelGameField = new System.Windows.Forms.PictureBox();
             this.btnPlay = new System.Windows.Forms.Button();
             this.lblInfo = new System.Windows.Forms.Label();
@@ -42,7 +39,7 @@
             // 
             // loginButton
             // 
-            this.loginButton.Location = new System.Drawing.Point(145, 10);
+            this.loginButton.Location = new System.Drawing.Point(105, 13);
             this.loginButton.Name = "loginButton";
             this.loginButton.Size = new System.Drawing.Size(75, 23);
             this.loginButton.TabIndex = 1;
@@ -52,39 +49,13 @@
             // 
             // logoutButton
             // 
-            this.logoutButton.Location = new System.Drawing.Point(226, 11);
+            this.logoutButton.Location = new System.Drawing.Point(294, 13);
             this.logoutButton.Name = "logoutButton";
             this.logoutButton.Size = new System.Drawing.Size(75, 23);
             this.logoutButton.TabIndex = 2;
             this.logoutButton.Text = "LogOut";
             this.logoutButton.UseVisualStyleBackColor = true;
             this.logoutButton.Click += new System.EventHandler(this.logoutButton_Click);
-            // 
-            // chatTextBox
-            // 
-            this.chatTextBox.Location = new System.Drawing.Point(28, 51);
-            this.chatTextBox.Multiline = true;
-            this.chatTextBox.Name = "chatTextBox";
-            this.chatTextBox.Size = new System.Drawing.Size(192, 23);
-            this.chatTextBox.TabIndex = 3;
-            // 
-            // messageTextBox
-            // 
-            this.messageTextBox.Location = new System.Drawing.Point(226, 51);
-            this.messageTextBox.Multiline = true;
-            this.messageTextBox.Name = "messageTextBox";
-            this.messageTextBox.Size = new System.Drawing.Size(504, 23);
-            this.messageTextBox.TabIndex = 4;
-            // 
-            // sendButton
-            // 
-            this.sendButton.Location = new System.Drawing.Point(736, 51);
-            this.sendButton.Name = "sendButton";
-            this.sendButton.Size = new System.Drawing.Size(75, 23);
-            this.sendButton.TabIndex = 5;
-            this.sendButton.Text = "Send";
-            this.sendButton.UseVisualStyleBackColor = true;
-            this.sendButton.Click += new System.EventHandler(this.sendButton_Click);
             // 
             // panelGameField
             // 
@@ -97,22 +68,23 @@
             // 
             // btnPlay
             // 
-            this.btnPlay.Location = new System.Drawing.Point(464, 11);
+            this.btnPlay.Location = new System.Drawing.Point(202, 13);
             this.btnPlay.Name = "btnPlay";
             this.btnPlay.Size = new System.Drawing.Size(75, 23);
             this.btnPlay.TabIndex = 7;
             this.btnPlay.Text = "Start";
             this.btnPlay.UseVisualStyleBackColor = true;
+            this.btnPlay.Visible = false;
             this.btnPlay.Click += new System.EventHandler(this.button1_Click);
             // 
             // lblInfo
             // 
             this.lblInfo.AutoSize = true;
-            this.lblInfo.Location = new System.Drawing.Point(568, 13);
+            this.lblInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.lblInfo.Location = new System.Drawing.Point(398, 16);
             this.lblInfo.Name = "lblInfo";
-            this.lblInfo.Size = new System.Drawing.Size(44, 16);
+            this.lblInfo.Size = new System.Drawing.Size(0, 20);
             this.lblInfo.TabIndex = 8;
-            this.lblInfo.Text = "label1";
             // 
             // userNameTextBox
             // 
@@ -136,9 +108,6 @@
             this.Controls.Add(this.lblInfo);
             this.Controls.Add(this.btnPlay);
             this.Controls.Add(this.panelGameField);
-            this.Controls.Add(this.sendButton);
-            this.Controls.Add(this.messageTextBox);
-            this.Controls.Add(this.chatTextBox);
             this.Controls.Add(this.logoutButton);
             this.Controls.Add(this.loginButton);
             this.KeyPreview = true;
@@ -154,9 +123,6 @@
         #endregion
         private System.Windows.Forms.Button loginButton;
         private System.Windows.Forms.Button logoutButton;
-        private System.Windows.Forms.TextBox chatTextBox;
-        private System.Windows.Forms.TextBox messageTextBox;
-        private System.Windows.Forms.Button sendButton;
         private System.Windows.Forms.PictureBox panelGameField;
         private System.Windows.Forms.Button btnPlay;
         private System.Windows.Forms.Label lblInfo;

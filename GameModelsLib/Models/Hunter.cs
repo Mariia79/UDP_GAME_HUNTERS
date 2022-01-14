@@ -108,7 +108,7 @@ namespace GameModelsLib
                 Game.GameField.Controls.Remove(LabelName);
 
                 base.Die();
-                Game.OnChangeGame();
+                Game.CheckEndGame();
             }
         }
 
