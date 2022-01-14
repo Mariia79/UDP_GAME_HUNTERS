@@ -172,6 +172,41 @@ namespace GameModelsLib
             }
         }
 
+
+        public static void CreateClientHunter()
+        {
+            int num = 0;
+                LoginNewPlayer(num, PlayerName);
+
+
+                if (MyHunter == null)
+                {
+                    foreach (Hunter h in Hunters)
+                    {
+                        if (h.Name.Contains(PlayerName))
+                        {
+                            MyHunter = h;
+                            break;
+                        }
+                    }
+
+                    MyHunter.ShowInfo();
+                    Game.lblInfo.Invoke((MethodInvoker)delegate ()
+                    {
+                        lblInfo.Text = MyHunter.Name;
+                    });
+
+                    Game.btnPlay.Invoke((MethodInvoker)delegate ()
+                    {
+
+                        btnPlay.Visible = num == 0;
+                    });
+                }
+
+
+     
+        }
+
         public static void CheckHuntersAction(string msg)
         {
             if (msg.Length == 3)
@@ -250,14 +285,14 @@ namespace GameModelsLib
 
             PlayerName = plName;
 
-            if (client == null)
-            {
-                client = new SimpleTcpClient();
-                client.StringEncoder = Encoding.UTF8;
-                client.DataReceived += Client_DataReceived;
-            }
+            //if (client == null)
+            //{
+            //    client = new SimpleTcpClient();
+            //    client.StringEncoder = Encoding.UTF8;
+            //    client.DataReceived += Client_DataReceived;
+            //}
 
-            client.Connect("127.0.0.1", 8910);
+            //client.Connect("127.0.0.1", 8910);
             huntersCount = 0;
 
 
@@ -268,10 +303,6 @@ namespace GameModelsLib
 
             if (Hunters == null)
                 Hunters = new List<Hunter>();
-            client.WriteLineAndGetReply("_" + plName, TimeSpan.FromSeconds(0));
-
-
-
         }
 
         public static Hunter LoginNewPlayer(int num, string name)

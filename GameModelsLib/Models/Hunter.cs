@@ -182,7 +182,7 @@ namespace GameModelsLib
             if (Game.IsRun)
             {
                 ActionsState = Number.ToString() + e.KeyChar.ToString();
-                Game.SendHunterActionState(this);
+                //Game.SendHunterActionState(this);
                 MoveHunter(e.KeyChar);
             }
         }

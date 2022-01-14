@@ -3,6 +3,11 @@ using System;
 using System.Windows.Forms;
 using GameServerKillers;
 
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading.Tasks;
+
 //using System.Windows.Media;
 
 namespace GameHunter
@@ -52,7 +57,7 @@ namespace GameHunter
 
         private void button1_Click_1(object sender, EventArgs e)
         {
-            Game.client.WriteLineAndGetReply("start", TimeSpan.FromSeconds(1));
+           // Game.client.WriteLineAndGetReply("start", TimeSpan.FromSeconds(1));
         }
 
         private void lblInfo_Click(object sender, EventArgs e)

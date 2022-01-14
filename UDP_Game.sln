@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameModelsLib", "GameModels
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameHunterServer", "GameHunterServer\GameHunterServer.csproj", "{EDD1C5E3-0A8C-45F4-9E3A-C4941DFC6A70}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UDPGameClient", "UDPGameClient\UDPGameClient.csproj", "{2F903959-8CCF-4A85-B7A8-A3F02EEE8609}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{EDD1C5E3-0A8C-45F4-9E3A-C4941DFC6A70}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EDD1C5E3-0A8C-45F4-9E3A-C4941DFC6A70}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EDD1C5E3-0A8C-45F4-9E3A-C4941DFC6A70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F903959-8CCF-4A85-B7A8-A3F02EEE8609}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F903959-8CCF-4A85-B7A8-A3F02EEE8609}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F903959-8CCF-4A85-B7A8-A3F02EEE8609}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F903959-8CCF-4A85-B7A8-A3F02EEE8609}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
