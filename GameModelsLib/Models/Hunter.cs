@@ -58,13 +58,13 @@ namespace GameModelsLib
 
 
             player = new System.Media.SoundPlayer(Environment.CurrentDirectory + "\\sounds\\shoot.wav");
-            ShowInfo();
+           
         }
 
 
         public void ShowInfo()
         {
-
+            if (IsConect)
             LabelName.Invoke((MethodInvoker)delegate ()
             {
                 LabelName.Text = Name + " " + LifeScore.ToString() + " " + Ammo.ToString();
@@ -104,6 +104,7 @@ namespace GameModelsLib
             }
             else
             {
+                IsConect = false;
                 Game.GameField.Controls.Remove(this);
                 Game.GameField.Controls.Remove(LabelName);
 

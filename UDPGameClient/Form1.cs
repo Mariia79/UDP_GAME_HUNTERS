@@ -17,7 +17,7 @@ namespace UDPGameClient
             InitializeComponent();
 
             loginButton.Enabled = true;
-            logoutButton.Enabled = false;
+
 
         }
   
@@ -35,7 +35,6 @@ namespace UDPGameClient
 
 
                 loginButton.Enabled = false;
-                logoutButton.Enabled = true;
         
             }
             catch (Exception ex)
@@ -95,7 +94,6 @@ namespace UDPGameClient
             UDPClient.client.Close();
 
             loginButton.Enabled = true;
-            logoutButton.Enabled = false;
         }
  
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)

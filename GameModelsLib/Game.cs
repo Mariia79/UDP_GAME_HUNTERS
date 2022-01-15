@@ -31,61 +31,14 @@ namespace GameModelsLib
 
         public static string PlayerName = "";
 
+        public static int BoxGeneratorClientNumber = -1;
+
 
 
         public static System.Windows.Forms.Timer timer;
 
-        private static void Timer_Tick(object sender, EventArgs e)
-        {
-            Random rnd = new Random();
-
-            int vypadok = rnd.Next(1, 6);
-            if (vypadok <= 1)
-            {
-                Medik randomMedik = new Medik(GetRandomPosition(800, 600));
-                randomMedik.ApplySkin();
-                return;
-            }
-            if (vypadok <= 2)
-            {
-                AmmoBox randomAmmo = new AmmoBox(GetRandomPosition(800, 600));
-                randomAmmo.ApplySkin();
-                return;
-            }
-            if (vypadok <= 6)
-            {
-                SpeedBox randomSpeed = new SpeedBox(GetRandomPosition(800, 600));
-                randomSpeed.ApplySkin();
-            }
-        }
 
 
-        public static void Timer_Tick1(object sender, EventArgs e)
-        {
-            if (IsRun)
-            {
-                Random rnd = new Random();
-
-                int vypadok = rnd.Next(1, 6);
-                Point p = Game.GetRandomPosition(800, 600);
-
-                if (vypadok <= 1)
-                {
-                    //server.BroadcastLine("*" + 1.ToString() + " " + p.X.ToString() + " " + p.Y.ToString() + " ");
-                    return;
-                }
-                if (vypadok <= 3)
-                {
-                    //server.BroadcastLine("*" + 2.ToString() + " " + p.X.ToString() + " " + p.Y.ToString() + " ");
-                    return;
-                }
-                if (vypadok <= 6)
-                {
-                    //server.BroadcastLine("*" + 3.ToString() + " " + p.X.ToString() + " " + p.Y.ToString() + " ");
-                    return;
-                }
-            }
-        }
 
         private static int huntersCount = 0;
         public static int HuntersCount
@@ -251,8 +204,47 @@ namespace GameModelsLib
         {
             timer = new System.Windows.Forms.Timer();
             timer.Interval = 3000;
-            timer.Tick += Timer_Tick;
+            timer.Tick += Timer_Tick1;
             timer.Start();
+        }
+
+        private static void Timer_Tick1(object sender, EventArgs e)
+        {
+            string line = "";
+            if (IsRun)
+            {
+                SetBoxGeneratorAsNextActiveClient();
+
+                if (BoxGeneratorClientNumber == MyHunter.Number)
+                {
+                    Random rnd = new Random();
+
+                    int vypadok = rnd.Next(1, 6);
+                    Point p = Game.GetRandomPosition(800, 600);
+
+                    if (vypadok <= 1)
+                    {
+                        line = "*" + 1.ToString() + " " + p.X.ToString() + " " + p.Y.ToString() + " ";
+                        UDPClient.SendMessageInfo(line);
+                        GetDropBox(line);
+                        return;
+                    }
+                    if (vypadok <= 3)
+                    {
+                        line = "*" + 2.ToString() + " " + p.X.ToString() + " " + p.Y.ToString() + " ";
+                        UDPClient.SendMessageInfo(line);
+                        GetDropBox(line);
+                        return;
+                    }
+                    if (vypadok <= 6)
+                    {
+                        line = "*" + 3.ToString() + " " + p.X.ToString() + " " + p.Y.ToString() + " ";
+                        UDPClient.SendMessageInfo(line);
+                        GetDropBox(line);
+                        return;
+                    }
+                }
+            }
         }
 
         public static void SendHunterActionState(Hunter h)
@@ -265,7 +257,7 @@ namespace GameModelsLib
             client.WriteLineAndGetReply(h.HealthAmmoState, TimeSpan.FromSeconds(0));
         }
 
-        public static void InitGame(string plName, PictureBox p, Label l, Button btn)// коли гравецб запустив гру і залогінивс
+        public static void InitGame(string plName, PictureBox p, Label l, Button btn)
         {
             btnPlay = btn;
             Restart();
@@ -297,10 +289,14 @@ namespace GameModelsLib
                 MyHunter.IsConect = true;
                 MyHunter.PreloadSkinImages();
                 MyHunter.ApplySkin();
+
+                MyHunter.ShowInfo();
             }
 
             UDPClient.SendMessageInfo("_" + Game.MyHunter.Number.ToString() + " " + Game.MyHunter.Name);
-            // _ - підключення нового гравця
+
+            StartDropBoxes();
+            
         }
 
 
@@ -359,35 +355,49 @@ namespace GameModelsLib
 
         public static void CheckEndGame()
         {
-            lblInfo.Invoke((MethodInvoker)delegate ()
-            {
-                string myMessage = "";
-                string WinnerName = "";
-                if (Game.IsRun)
-                {
-                    int alive = 0;
-                   
-                    foreach (Hunter h in Hunters)
-                    {
-                        if (h.LifeScore > 0)
-                        {
-                            WinnerName = h.Name;
-                            alive++;
-                        }
-                    }
-                    if (alive == 1)
-                    {
-                        lblInfo.Text = myMessage + ". Game is over! " + WinnerName + " WIN !!!";
 
-                        Game.IsRun = false;
-                        UDPClient.SendMessageInfo("end");
-                       
+            string myMessage = "";
+            string WinnerName = "";
+            if (Game.IsRun)
+            {
+                int alive = 0;
+
+                foreach (Hunter h in Hunters)
+                {
+                    if (h.IsConect && h.LifeScore > 0)
+                    {
+                        WinnerName = h.Name;
+                        alive++;
                     }
                 }
+                if (alive == 1)
+                {
+                    Game.IsRun = false;
+                    UDPClient.SendMessageInfo("end");
+                    lblInfo.Invoke((MethodInvoker)delegate ()
+                    {
+                        lblInfo.Text = myMessage + ". Game is over! " + WinnerName + " WIN !!!";
+                    });
+                    
 
-            });
-
+                }
+            }
         }
+
+
+        public static void SetBoxGeneratorAsNextActiveClient()
+        {
+            BoxGeneratorClientNumber = 0;
+            foreach (Hunter h in Hunters)
+            {
+                if (h.IsConect && h.LifeScore > 0)
+                {
+                    return;
+                    BoxGeneratorClientNumber++;
+                }
+            }
+        }
+
 
         public static Point GetRandomPosition()
         {
@@ -406,16 +416,6 @@ namespace GameModelsLib
             Random random = new Random();
             p.X = random.Next(0 + delta, w - delta);
             p.Y = random.Next(0 + delta, h - delta);
-            return p;
-        }
-
-        static Point GetHunterPosition()
-        {
-
-            Point p = new Point(0, 0);
-
-            p.X = GameField.Width / 2;
-            p.Y = GameField.Height - 100;
             return p;
         }
 

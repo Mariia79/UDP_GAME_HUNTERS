@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Drawing;
-
+using System.Numerics;
 
 namespace GameModelsLib
 {
@@ -16,7 +16,7 @@ namespace GameModelsLib
             Ammo = random.Next(1, 4) * 5;
             Width = 50;
             Height = 40;
-
+            timer.Start();
 
         }
 
@@ -38,7 +38,7 @@ namespace GameModelsLib
             foreach (Hunter hunter in Game.Hunters)
             {
 
-                if (this.IsIntersection(hunter))
+                if (Vector2.Distance(new Vector2(this.Center.X, this.Center.Y), new Vector2(hunter.Center.X, hunter.Center.Y)) < 50)
                 {
                     foundedHunter = hunter;
                     break;
@@ -47,7 +47,7 @@ namespace GameModelsLib
 
             if (foundedHunter != null)
             {
-                foundedHunter.SpeedForcedLifeTick += 690;
+                foundedHunter.SpeedForcedLifeTick += 100;
                 foundedHunter.ShowInfo();
                 this.Die();
 

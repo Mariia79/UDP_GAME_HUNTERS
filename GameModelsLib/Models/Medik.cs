@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Drawing;
-
+using System.Numerics;
 
 namespace GameModelsLib
 {
@@ -17,7 +17,7 @@ namespace GameModelsLib
             Width = 40;
             Height = 30;
 
-
+            timer.Start();
         }
 
         public override void ApplySkin()
@@ -38,7 +38,7 @@ namespace GameModelsLib
             foreach (Hunter hunter in Game.Hunters)
             {
 
-                if (this.IsIntersection(hunter))
+                if (Vector2.Distance(new Vector2(this.Center.X, this.Center.Y), new Vector2(hunter.Center.X, hunter.Center.Y)) < 50)
                 {
                     foundedHunter = hunter;
                     break;
